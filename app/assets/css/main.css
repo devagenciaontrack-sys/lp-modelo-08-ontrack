@@ -176,3 +176,8 @@ h1{ font-family:var(--serif); font-weight:400; font-size:clamp(42px, 5.6vw, 74px
 
 /* celular: área de toque mínima de 44px */
 @media (max-width:760px){ .marca{ min-height:44px; display:inline-flex; align-items:center; } }
+
+/* regras de interface: toque, pular para o conteúdo */
+html{ touch-action:manipulation; -webkit-tap-highlight-color:rgba(217,83,106,.18); }
+.skip{ position:absolute; left:-9999px; top:12px; z-index:100; padding:10px 16px; border-radius:8px; background:#111; color:#fff; font-weight:700; text-decoration:none; }
+.skip:focus-visible{ left:12px; }
