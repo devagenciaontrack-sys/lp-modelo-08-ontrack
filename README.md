@@ -27,3 +27,6 @@ npm run generate   # site estático em .output/public
 ```
 - **Vercel:** importe o repositório; a Vercel detecta o Nuxt sozinha. Não defina `LP_BASE`.
 - **GitHub Pages (demonstração):** `LP_BASE=/lp-modelo-08-ontrack/ npm run generate` e publique `.output/public` no branch `gh-pages`.
+
+## Briefing para o cliente
+PDF com tudo o que precisamos do cliente para montar o site: [baixar o briefing](Briefing-Modelo-08-Dentista.pdf?raw=1)
