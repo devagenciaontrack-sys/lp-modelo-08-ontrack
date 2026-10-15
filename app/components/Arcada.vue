@@ -63,8 +63,8 @@ const torto: Record<number, number> = { 11: 9, 21: -11, 12: -8, 22: 10 }
 .palato{ fill:#FCEEF0; opacity:.7; }
 .dente{ fill:#FBF8F1; stroke:#D9CFBF; stroke-width:1.5; transition:fill .3s, stroke .3s, opacity .3s; }
 .dente.amarelo{ fill:#EBDDB5; }
-.dente.on{ fill:#FFE1E5; stroke:#D9536A; stroke-width:3; }
-.dente.falta{ fill:transparent; stroke:#D9536A; stroke-dasharray:4 4; stroke-width:2; }
+.dente.on{ fill:#DCEBFF; stroke:#1E6FD9; stroke-width:3; }
+.dente.falta{ fill:transparent; stroke:#1E6FD9; stroke-dasharray:4 4; stroke-width:2; }
 .sulco{ fill:none; stroke:#E4DACA; stroke-width:1.5; stroke-linecap:round; }
 .dente-g{ transition:transform .4s cubic-bezier(.2,.7,.2,1); }
 @media (prefers-reduced-motion:no-preference){

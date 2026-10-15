@@ -32,14 +32,15 @@ const casoId = ref('sensivel')
 const caso = computed(() => casos.find(c => c.id === casoId.value)!)
 
 const areas = [
-  { g: 'Prevenção', itens: ['Limpeza e polimento', 'Aplicação de flúor', 'Selante para crianças'] },
-  { g: 'Estética', itens: ['Clareamento', 'Lentes de contato dental', 'Facetas em resina'] },
-  { g: 'Reabilitação', itens: ['Implantes', 'Coroas e próteses', 'Restaurações na cor do dente'] },
-  { g: 'Ortodontia', itens: ['Aparelho fixo', 'Alinhadores transparentes', 'Contenção'] },
-  { g: 'Endodontia', itens: ['Tratamento de canal', 'Retratamento de canal'] },
-  { g: 'Cirurgia', itens: ['Extração de siso', 'Enxerto ósseo'] },
-  { g: 'Odontopediatria', itens: ['Primeira consulta do bebê', 'Prevenção de cáries', 'Orientação para os pais'] },
+  { g: 'Prevenção', d: 'Limpeza, flúor e acompanhamento para nada virar problema.', itens: ['Limpeza e polimento', 'Aplicação de flúor', 'Selante'], img: 'prevencao.webp', w: 1000, h: 818 },
+  { g: 'Estética', d: 'Clareamento, lentes e facetas planejados para o seu rosto.', itens: ['Clareamento', 'Lentes de contato dental', 'Facetas em resina'], img: 'sorriso.webp', w: 1200, h: 729 },
+  { g: 'Implantes e próteses', d: 'Repor um dente ou vários, com aparência natural.', itens: ['Implantes', 'Coroas e próteses', 'Restaurações na cor do dente'], img: 'atendimento.webp', w: 1400, h: 968 },
+  { g: 'Ortodontia', d: 'Aparelho fixo ou alinhadores transparentes.', itens: ['Aparelho fixo', 'Alinhadores transparentes', 'Contenção'], img: 'procedimento.webp', w: 1200, h: 1798 },
+  { g: 'Canal e cirurgia', d: 'Canal, siso e enxerto, com anestesia e cuidado.', itens: ['Tratamento de canal', 'Extração de siso', 'Enxerto ósseo'], img: 'exame.webp', w: 1200, h: 803 },
+  { g: 'Odontopediatria', d: 'Da primeira consulta do bebê à adolescência, sem medo.', itens: ['Primeira consulta do bebê', 'Prevenção de cáries', 'Orientação para os pais'], img: 'infantil.webp', w: 1200, h: 800 },
 ]
+const numeros = [{ v: '12', l: 'anos de clínica' }, { v: '8 mil+', l: 'pacientes atendidos' }, { v: '6', l: 'especialidades' }]
+const iniciais = (n: string) => n.replace(/^Dra?\.\s*/, '').split(' ').map(x => x[0]).join('').slice(0, 2)
 const etapas = [
   { t: 'Conversa', d: 'Você conta o que incomoda e o que espera do tratamento. Sem pressa.' },
   { t: 'Exame e raio-x', d: 'Exame clínico completo e raio-x digital feito na própria clínica.' },
@@ -52,9 +53,10 @@ const equipe = [
   { n: 'Dra. Nome Sobrenome', cro: 'CRO-UF 00000', esp: 'Odontopediatria' },
 ]
 const depoimentos = [
-  { t: 'Morria de medo de dentista. A doutora explicou cada passo antes de fazer e eu não senti nada.', n: 'Patrícia L.' },
-  { t: 'Fiz o canal de manhã e voltei a trabalhar à tarde. Atendimento pontual e muito cuidadoso.', n: 'Ricardo M.' },
-  { t: 'Levo meus dois filhos. Eles saem da consulta pedindo para voltar.', n: 'Aline F.' },
+  { t: 'Morria de medo de dentista. A doutora explicou cada passo antes de fazer e eu não senti nada. Hoje vou nas revisões sem ansiedade.', n: 'Patrícia L.', s: 'Paciente há 3 anos', trat: 'Tratamento de canal' },
+  { t: 'Fiz o canal de manhã e voltei a trabalhar à tarde. Atendimento pontual e muito cuidadoso.', n: 'Ricardo M.', s: 'Paciente há 1 ano', trat: 'Endodontia' },
+  { t: 'Levo meus dois filhos. Eles saem da consulta pedindo para voltar.', n: 'Aline F.', s: 'Mãe de pacientes', trat: 'Odontopediatria' },
+  { t: 'O clareamento ficou natural, do jeito que eu queria. Ninguém diz que eu fiz.', n: 'Bruno T.', s: 'Paciente há 2 anos', trat: 'Clareamento' },
 ]
 const faq = [
   { q: 'Tenho medo de dentista. Como vocês lidam com isso?', a: 'A primeira consulta é só conversa e exame. Explicamos tudo antes de fazer e você pode pedir para parar a qualquer momento.' },
@@ -117,9 +119,10 @@ function agendarCaso() {
               <li>Atendimento infantil</li>
             </ul>
           </div>
-          <div class="hero-arcada">
-            <Arcada acender />
-            <p class="hero-resp">Responsável técnica: {{ site.responsavel }} · {{ site.cro }}</p>
+          <div class="hero-midia">
+            <img class="hero-foto" :src="`${base}fotos/hero.webp`" width="1600" height="1140" alt="Consultório odontológico claro com dentista organizando o atendimento" fetchpriority="high">
+            <div class="hero-card hero-card-a"><span class="hc-ic"><svg><use href="#i-dente" /></svg></span><span><b>{{ site.responsavel }}</b><small>{{ site.cro }} · Responsável técnica</small></span></div>
+            <div class="hero-card hero-card-b"><b>4,9</b><span><i aria-hidden="true">★★★★★</i>no Google</span></div>
           </div>
         </div>
       </section>
@@ -152,13 +155,20 @@ function agendarCaso() {
 
       <!-- tratamentos -->
       <section id="tratamentos" class="tratamentos">
-        <div class="wrap trat-grid">
-          <div>
-            <h2>Tratamentos</h2>
-            <p class="sec-desc">Da limpeza de rotina ao implante, tudo no mesmo lugar e com a mesma equipe acompanhando o seu histórico.</p>
+        <div class="wrap">
+          <div class="sec-head">
+            <div><h2>Tratamentos</h2><p class="sec-desc">Da limpeza de rotina ao implante, tudo no mesmo lugar e com a mesma equipe acompanhando o seu histórico.</p></div>
+            <a class="btn btn-linha" href="#agendar">Agendar avaliação</a>
           </div>
-          <div class="areas">
-            <div v-for="a in areas" :key="a.g" class="area"><h3>{{ a.g }}</h3><ul><li v-for="i in a.itens" :key="i">{{ i }}</li></ul></div>
+          <div class="trat-cards">
+            <article v-for="(a, i) in areas" :key="a.g" class="trat" :class="`t${i + 1}`">
+              <img :src="`${base}fotos/${a.img}`" :width="a.w" :height="a.h" :alt="a.g" loading="lazy">
+              <div class="trat-txt">
+                <h3>{{ a.g }}</h3>
+                <p>{{ a.d }}</p>
+                <ul><li v-for="it in a.itens" :key="it">{{ it }}</li></ul>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -176,7 +186,7 @@ function agendarCaso() {
       <!-- clínica -->
       <section id="clinica" class="clinica">
         <div class="wrap clin-grid">
-          <img :src="`${base}fotos/consultorio.webp`" width="1600" height="1200" alt="Consultório odontológico com cadeira, equipo e armários" loading="lazy" class="clin-foto">
+          <img :src="`${base}fotos/biosseguranca.webp`" width="1200" height="800" alt="Profissional de odontologia atendendo com touca, máscara, protetor facial e luvas" loading="lazy" class="clin-foto">
           <div>
             <h2>Biossegurança que você pode ver</h2>
             <ul class="bio">
@@ -193,26 +203,46 @@ function agendarCaso() {
       <!-- TODO: trocar pela história real, fotos e CROs da equipe -->
       <section id="sobre" class="sobre">
         <div class="wrap sobre-grid">
-          <div>
+          <div class="sobre-fotos">
+            <img class="sf-1" :src="`${base}fotos/consultorio.webp`" width="1400" height="1050" alt="Consultório com cadeira odontológica e armários" loading="lazy">
+            <img class="sf-2" :src="`${base}fotos/atendimento.webp`" width="1400" height="968" alt="Dentista atendendo um paciente" loading="lazy">
+            <div class="sf-selo"><b>{{ numeros[0].v }}</b><span>{{ numeros[0].l }}</span></div>
+          </div>
+          <div class="sobre-txt">
             <h2>Sobre nós</h2>
             <p class="sec-desc">A {{ site.marca }} nasceu da vontade de fazer uma odontologia sem pressa: consulta com tempo para conversar, explicação antes de qualquer procedimento e o mesmo dentista acompanhando você do começo ao fim.</p>
-            <img :src="`${base}fotos/exame.webp`" width="1400" height="937" alt="Dentista examinando a boca de uma paciente" loading="lazy" class="sobre-foto">
+            <dl class="sobre-nums"><div v-for="n in numeros" :key="n.l"><dt>{{ n.v }}</dt><dd>{{ n.l }}</dd></div></dl>
+            <ul class="equipe">
+              <li v-for="p in equipe" :key="p.n + p.esp">
+                <span class="foto-esp" aria-hidden="true">{{ iniciais(p.n) }}</span>
+                <div><h3>{{ p.n }}</h3><p>{{ p.esp }}</p><small>{{ p.cro }}<template v-if="p.resp"> · Responsável técnica</template></small></div>
+              </li>
+            </ul>
           </div>
-          <ul class="equipe">
-            <li v-for="p in equipe" :key="p.n + p.esp">
-              <span class="foto-esp" aria-hidden="true"><svg><use href="#i-dente" /></svg></span>
-              <div><h3>{{ p.n }}</h3><p>{{ p.esp }}</p><small>{{ p.cro }}<template v-if="p.resp"> · Responsável técnica</template></small></div>
-            </li>
-          </ul>
         </div>
       </section>
 
       <!-- depoimentos -->
       <section class="depoimentos">
         <div class="wrap">
-          <h2>O que dizem os pacientes</h2>
-          <div class="deps">
-            <figure v-for="d in depoimentos" :key="d.n"><blockquote>“{{ d.t }}”</blockquote><figcaption>{{ d.n }}</figcaption></figure>
+          <div class="sec-head">
+            <h2>O que dizem os pacientes</h2>
+            <div class="google"><b>4,9</b><span><i aria-hidden="true">★★★★★</i>000 avaliações no Google</span></div>
+          </div>
+          <div class="dep-grid">
+            <figure class="dep-destaque">
+              <img :src="`${base}fotos/sorriso.webp`" width="1200" height="729" alt="" loading="lazy">
+              <div class="dep-destaque-txt">
+                <span class="estrelas" aria-label="5 de 5 estrelas">★★★★★</span>
+                <blockquote>“{{ depoimentos[0].t }}”</blockquote>
+                <figcaption><span class="av" aria-hidden="true">{{ depoimentos[0].n[0] }}</span><span><b>{{ depoimentos[0].n }}</b><small>{{ depoimentos[0].s }} · {{ depoimentos[0].trat }}</small></span></figcaption>
+              </div>
+            </figure>
+            <figure v-for="d in depoimentos.slice(1)" :key="d.n" class="dep">
+              <span class="estrelas" aria-label="5 de 5 estrelas">★★★★★</span>
+              <blockquote>“{{ d.t }}”</blockquote>
+              <figcaption><span class="av" aria-hidden="true">{{ d.n[0] }}</span><span><b>{{ d.n }}</b><small>{{ d.s }} · {{ d.trat }}</small></span></figcaption>
+            </figure>
           </div>
           <p class="aviso">Depoimentos de exemplo: substitua por relatos reais, com autorização dos pacientes.</p>
         </div>
@@ -263,7 +293,7 @@ function agendarCaso() {
             <p><svg><use href="#i-pin" /></svg>{{ site.endereco }}</p>
             <p><svg><use href="#i-relogio" /></svg>{{ site.horario }}</p>
             <a class="btn btn-linha-escura" :href="site.mapa" target="_blank" rel="noopener">Ver no mapa</a>
-            <img :src="`${base}fotos/atendimento.webp`" width="1400" height="2097" alt="Dentista ajustando o aparelho de um paciente" loading="lazy" class="ag-foto">
+            <img :src="`${base}fotos/exame.webp`" width="1200" height="803" alt="Dentista examinando a boca de uma paciente" loading="lazy" class="ag-foto">
           </div>
         </div>
       </section>
@@ -281,7 +311,7 @@ function agendarCaso() {
         </div>
       </div>
       <div class="wrap"><div class="rod-final">
-        <span>© {{ new Date().getFullYear() }} {{ site.marca }}. Fotos de ambientação: Harrison Keely (CC BY 4.0), Conor Lawless e Shixart1985 (CC BY 2.0), via Wikimedia Commons.</span>
+        <span>© {{ new Date().getFullYear() }} {{ site.marca }}. Fotos de ambientação: Germanna CC, Harrison Keely, Conor Lawless, Shixart1985 e Oleg Ponomarev (CC BY), U.S. DoD (domínio público) e Steve Buissinne (CC0), via Wikimedia Commons.</span>
         <a class="rod-credito" href="https://www.ontrackagenciadigital.com.br/" target="_blank" rel="noopener">Desenvolvido por <b>OnTrack Agência Digital</b></a>
       </div></div>
     </footer>
