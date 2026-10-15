@@ -43,7 +43,7 @@ async function iniciar() {
   const pmrem = new THREE.PMREMGenerator(renderer)
   cena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100)
-  camera.position.set(0, 1.2, 14.2)
+  camera.position.set(0, 1.3, 15.6)
   camera.lookAt(0, -0.9, 0)
 
   const luz = new THREE.DirectionalLight(0xffffff, 1.6)
@@ -56,13 +56,13 @@ async function iniciar() {
   const modelo = new THREE.Group()
   cena.add(modelo)
 
-  const COR = { dente: 0xF7F4EE, amarelo: 0xE6CF8E, realce: 0x6FB0FF, gengiva: 0xF0D3D7, alerta: 0xE0828F }
+  const COR = { dente: 0xF7F4EE, amarelo: 0xE6CF8E, realce: 0x2F7FEA, gengiva: 0xF0D3D7, alerta: 0xE0828F }
   const matGengiva = new THREE.MeshStandardMaterial({ color: COR.gengiva, roughness: 0.62, metalness: 0 })
 
   // gengiva em forma de ferradura (meia elipse com espessura), com bordas arredondadas
-  const ferradura = (a: number, b: number, fora: number, dentro: number, altura: number) => {
+  const ferradura = (a: number, b: number, fora: number, dentro: number, altura: number, tFim: number) => {
     const s = new THREE.Shape()
-    const N = 48, ini = -1.72, fim = 1.72
+    const N = 64, ini = -tFim, fim = tFim
     for (let k = 0; k <= N; k++) { const t = ini + (fim - ini) * k / N; const x = (a + fora) * Math.sin(t), y = (b + fora) * Math.cos(t); k ? s.lineTo(x, y) : s.moveTo(x, y) }
     for (let k = N; k >= 0; k--) { const t = ini + (fim - ini) * k / N; s.lineTo((a - dentro) * Math.sin(t), (b - dentro) * Math.cos(t)) }
     const g = new THREE.ExtrudeGeometry(s, { depth: altura, bevelEnabled: true, bevelThickness: 0.3, bevelSize: 0.26, bevelSegments: 8, curveSegments: 32 })
@@ -113,26 +113,31 @@ async function iniciar() {
   const gengivas: any[] = []
 
   const arcada = (sup: boolean) => {
-    const a = sup ? 3.05 : 2.78, b = sup ? 2.7 : 2.4
+    const a = sup ? 3.05 : 2.78, b = sup ? 3.4 : 3.1, zc = -1.1 // arco em U, recuado para girar pelo centro
     const tabela = sup ? SUP : INF
     // posições ao longo da curva pelo comprimento do arco
     const N = 600, pts: { t: number, s: number }[] = []
     let s = 0, ax = 0, az = b
-    for (let k = 0; k <= N; k++) { const t = (k / N) * 1.6; const x = a * Math.sin(t), z = b * Math.cos(t); s += Math.hypot(x - ax, z - az); ax = x; az = z; pts.push({ t, s }) }
+    for (let k = 0; k <= N; k++) { const t = (k / N) * 2.4; const x = a * Math.sin(t), z = b * Math.cos(t); s += Math.hypot(x - ax, z - az); ax = x; az = z; pts.push({ t, s }) }
     const gap = 0.02
     const yGengiva = sup ? 0.1 : -1.62
     // gengiva
-    const g = new THREE.Mesh(ferradura(a, b, 0.02, 0.9, 0.4), matGengiva)
+    let tMax = 1.6
+    const criarGengiva = () => {
+    const g = new THREE.Mesh(ferradura(a, b, 0.02, 0.9, 0.4, tMax + 0.12), matGengiva)
+    g.position.z = zc
     g.position.y = sup ? yGengiva + 0.4 + 0.12 : yGengiva - 0.12
     g.castShadow = g.receiveShadow = true
     modelo.add(g)
     gengivas.push(g)
+    }
     for (const lado of [-1, 1]) {
       let pos = 0.02
       tabela.forEach(([w, h, d], i) => {
         const alvo = pos + w / 2
         const q = pts.find(z => z.s >= alvo) || pts[pts.length - 1]
-        const x = lado * a * Math.sin(q.t), z = b * Math.cos(q.t)
+        const x = lado * a * Math.sin(q.t), z = b * Math.cos(q.t) + zc
+        tMax = Math.max(tMax, q.t)
         const mat = new THREE.MeshStandardMaterial({ color: COR.dente, roughness: 0.38, metalness: 0 })
         const mesh = new THREE.Mesh(geometriaDente(i, w, h, d), mat)
         mesh.position.set(x, sup ? yGengiva - h / 2 + 0.22 : yGengiva + h / 2 - 0.22, z)
@@ -145,23 +150,33 @@ async function iniciar() {
         pos += w + gap
       })
     }
+    criarGengiva()
   }
   arcada(true)
   arcada(false)
   modelo.position.y = 0.55
 
+  let centro = 0, amplitude = 0.55
   atualizar = () => {
     matGengiva.color.setHex(props.gengiva ? COR.alerta : COR.gengiva)
     for (const d of dentes) {
       const falta = d.sup && props.ausente.includes(d.n)
       const real = d.sup && props.destaque.includes(d.n)
-      d.mesh.visible = !falta
-      d.mat.color.setHex(props.amarelado && d.i < 3 ? COR.amarelo : real ? COR.realce : COR.dente)
-      d.mat.emissive.setHex(real ? 0x0B2A55 : 0x000000)
+      // dente ausente vira um 'fantasma' azul transparente no lugar
+      d.mat.transparent = falta; d.mat.opacity = falta ? 0.28 : 1; d.mat.depthWrite = !falta
+      d.mesh.castShadow = !falta
+      d.mat.color.setHex(falta ? COR.realce : props.amarelado && d.i < 3 ? COR.amarelo : real ? COR.realce : COR.dente)
+      d.mat.emissive.setHex(real ? 0x0A2A66 : 0x000000)
       const tt = d.sup && props.desalinhado ? torto[d.n] : undefined
       d.mesh.rotation.z = tt ? tt[0] : 0
       d.mesh.rotation.y = d.rot0 + (tt ? tt[1] : 0)
     }
+    // se só dentes de trás estão em destaque (ex.: siso), gira o modelo para mostrar esse lado
+    const tras = dentes.filter(d => d.sup && (props.destaque.includes(d.n) || props.ausente.includes(d.n)))
+    if (tras.length && tras.every(d => d.i >= 5)) {
+      const ladoEsq = tras.every(d => d.n < 20) // só dentes do lado 1x (esquerda na tela)
+      centro = ladoEsq ? 1.4 : -1.4; amplitude = 0.15
+    } else { centro = 0; amplitude = 0.55 }
   }
   atualizar()
 
@@ -182,7 +197,7 @@ async function iniciar() {
 
   let visivel = true, quadro = 0
   const desenhar = () => {
-    if (!arrastando && !reduzido) { t += 0.008; giroY += (Math.sin(t) * 0.55 - giroY) * 0.05 }
+    if (!arrastando && !reduzido) { t += 0.008; giroY += (centro + Math.sin(t) * amplitude - giroY) * 0.05 }
     modelo.rotation.set(giroX, giroY, 0)
     renderer.render(cena, camera)
     quadro = visivel ? requestAnimationFrame(desenhar) : 0
