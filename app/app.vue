@@ -137,7 +137,7 @@ function agendarCaso() {
               <button v-for="c in casos" :key="c.id" type="button" role="radio" :aria-checked="casoId === c.id" :class="{ on: casoId === c.id }" @click="casoId = c.id">{{ c.sintoma }}</button>
             </div>
             <div class="sint-mapa">
-              <Arcada :destaque="caso.destaque" :ausente="caso.ausente" :gengiva="caso.gengiva" :desalinhado="caso.desalinhado" :amarelado="caso.amarelado" />
+              <Arcada3D :destaque="caso.destaque" :ausente="caso.ausente" :gengiva="caso.gengiva" :desalinhado="caso.desalinhado" :amarelado="caso.amarelado" />
             </div>
             <article class="sint-ficha" aria-live="polite">
               <h3>{{ caso.tratamento }}</h3>
