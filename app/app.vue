@@ -64,6 +64,8 @@ const faq = [
   { q: 'Quanto tempo dura a primeira consulta?', a: 'Cerca de 50 minutos, já com o raio-x.' },
 ]
 
+const duvida = ref(0)
+
 // ============ AGENDAMENTO ============
 const nome = ref('')
 const motivo = ref('Avaliação geral')
@@ -215,12 +217,24 @@ function agendarCaso() {
         </div>
       </section>
 
-      <!-- dúvidas -->
+      <!-- dúvidas: a doutora responde -->
       <section class="duvidas">
-        <div class="wrap duv-grid">
-          <h2>Dúvidas comuns</h2>
-          <div class="duv-lista">
-            <details v-for="(f, i) in faq" :key="f.q" :open="i === 0"><summary>{{ f.q }}</summary><p>{{ f.a }}</p></details>
+        <div class="wrap">
+          <h2>Pergunte à doutora</h2>
+          <p class="sec-desc">As perguntas que mais ouvimos na cadeira, respondidas por quem atende você.</p>
+          <div class="resp-grid">
+            <ul class="resp-lista" role="tablist" aria-label="Perguntas">
+              <li v-for="(f, i) in faq" :key="f.q"><button type="button" role="tab" :aria-selected="duvida === i" :class="{ on: duvida === i }" @click="duvida = i"><svg aria-hidden="true"><use href="#i-dente" /></svg>{{ f.q }}</button></li>
+            </ul>
+            <article class="resp-carta" role="tabpanel" aria-live="polite">
+              <p class="resp-q">“{{ faq[duvida].q }}”</p>
+              <Transition name="resp" mode="out-in"><p :key="duvida" class="resp-a">{{ faq[duvida].a }}</p></Transition>
+              <footer class="resp-assina">
+                <span class="resp-av" aria-hidden="true"><svg><use href="#i-dente" /></svg></span>
+                <span><b>{{ site.responsavel }}</b><small>{{ site.cro }} · Responsável técnica</small></span>
+              </footer>
+              <a class="btn btn-linha resp-btn" :href="wa('Olá! Tenho uma dúvida para a doutora.')" target="_blank" rel="noopener"><svg><use href="#i-wa" /></svg>Mandar outra pergunta</a>
+            </article>
           </div>
         </div>
       </section>
